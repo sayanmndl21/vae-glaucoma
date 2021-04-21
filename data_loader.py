@@ -13,7 +13,7 @@ class FundusDataLoader(torch.utils.data.Dataset):
         df_subjective['with_subjective'] = 1
 
         df = df.join(df_subjective.set_index('maskedid'), on = 'maskedid')
-        self.df = df.loc[df.with_subjective.isnull() == True].reset_index(drop = True)
+        df = df.loc[df.with_subjective.isnull() == True].reset_index(drop = True)
         self.img_folder = img_folder
         self.transform = transform
         self.labeltype = labeltype    
@@ -21,8 +21,10 @@ class FundusDataLoader(torch.utils.data.Dataset):
                             'glaucoma':1, 
                             'normal' : 0}
         if not suspect:
-            self.df = self.df.loc[df[labeltype] != 'suspect']
+            self.df = df.loc[df[labeltype] != 'suspect']
             self.classindex.pop('suspect')
+        else:
+            self.df = df
 
 
     def __len__(self):
