@@ -11,7 +11,7 @@ def latent_space_representation(grid_w, extent, model):
   for i in x:
       for j in y:
           z = Variable(torch.FloatTensor([i, j])).cuda()
-          sample = model.P(z).cpu()
+          sample = model.decoder(z).cpu()
           sample = sample.data.cpu().numpy().reshape(28,28)
           final_img_grid[x_pixel:x_pixel+28, y_pixel:y_pixel+28] = sample
           y_pixel += 28
