@@ -123,10 +123,10 @@ class convVAE(nn.Module):
             nn.Flatten()
         )
         self.fc1 = nn.Sequential(
-            nn.Linear(self.lin_shape * (self.z_dim)**2, n_latent*2),
-            nn.BatchNorm1d(n_latent*2),
+            nn.Linear(self.lin_shape * (self.z_dim)**2, 2048*2),
+            nn.BatchNorm1d(2048*2),
             nn.LeakyReLU(),
-            nn.Linear( n_latent*2,n_latent),
+            nn.Linear( 2048*2,n_latent),
             nn.BatchNorm1d(n_latent),
             nn.LeakyReLU(),
         )
