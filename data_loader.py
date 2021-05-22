@@ -39,6 +39,36 @@ class FundusDataLoader(torch.utils.data.Dataset):
         return image, label
 
 
+class ProgressionDataLoader(torch.utils.data.Dataset):
+    def __init__(self, csv_path, img_folder,suspect =True, transform = None):
+        df = pd.read_csv(csv_path, low_memory=False)
+        self.img_folder = img_folder
+        self.transform = transform
+        self.labeltype = 'class'   
+        self.classindex = {'suspect': 2,
+                            'glaucoma':1, 
+                            'normal' : 0}
+        if not suspect:
+            self.df = df.loc[df[labeltype] != 'suspect']
+            self.classindex.pop('suspect')
+        else:
+            self.df = df
+
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, index):
+        filename = self.df.iloc[index]["name"]
+        label = self.classindex[self.df.iloc[index][self.labeltype]]
+        time = self.df.iloc[index]["photodat_"]
+        idx = self.df.iloc[index]["idx"]
+        image = PIL.Image.open(os.path.join(self.img_folder,filename))
+        if self.transform is not None:
+            image = self.transform(image)
+        return image, label, time, idx
+
+
 #loads oct + vf significant values as well
 class PROBDataLoader(torch.utils.data.Dataset):
     def __init__(self, csv_path, img_folder, subjective_csv = '/home/vip/sayan-mandal/datasets/obj_criteria/20200623-images_with_subjective.csv', \
