@@ -76,20 +76,20 @@ class FullDataLoader(torch.utils.data.Dataset):
     def __getitem__(self, index):
         filename = self.df.iloc[index]["file_jpg"]
         #glauc/msdprob/psdprob/mdinf/mdsup/rnflclass/rnflti/tnflni/rnflts/rnflns
-        label = [self.classindex[self.df.iloc[index]['classification2']],
-        self.prob[self.df.iloc[index]['mdprob']],
-        self.prob[self.df.iloc[index]['psdprob']],
-        self.prob[self.df.iloc[index]['md_inf_prob']],
-        self.prob[self.df.iloc[index]['md_sup_prob']],
-        self.rnflp[self.df.iloc[index]['rnflclass_g']],
-        self.rnflp[self.df.iloc[index]['rnflclass_ti']],
-        self.rnflp[self.df.iloc[index]['rnflclass_ni']],
-        self.rnflp[self.df.iloc[index]['rnflclass_ts']],
-        self.rnflp[self.df.iloc[index]['rnflclass_ns']]]
+        label1 = self.classindex[self.df.iloc[index]['classification2']]
+        label2 = self.prob[self.df.iloc[index]['mdprob']]
+        label3 = self.prob[self.df.iloc[index]['psdprob']]
+        label4 = self.prob[self.df.iloc[index]['md_inf_prob']]
+        label5 = self.prob[self.df.iloc[index]['md_sup_prob']]
+        label6 = self.rnflp[self.df.iloc[index]['rnflclass_g']]
+        label7 = self.rnflp[self.df.iloc[index]['rnflclass_ti']]
+        label8 = self.rnflp[self.df.iloc[index]['rnflclass_ni']]
+        label9 =self.rnflp[self.df.iloc[index]['rnflclass_ts']]
+        label10 = self.rnflp[self.df.iloc[index]['rnflclass_ns']]
         image = PIL.Image.open(os.path.join(self.img_folder,filename))
         if self.transform is not None:
             image = self.transform(image)
-        return image, label
+        return image, label1,label2,label3,label4,label5,label6,label7,label8,label9,label10
 
 
 class ProgressionDataLoader(torch.utils.data.Dataset):
