@@ -38,6 +38,59 @@ class FundusDataLoader(torch.utils.data.Dataset):
             image = self.transform(image)
         return image, label
 
+class FullDataLoader(torch.utils.data.Dataset):
+    def __init__(self, csv_path, img_folder, subjective_csv = '/home/vip/sayan-mandal/datasets/obj_criteria/20200623-images_with_subjective.csv',suspect =False, transform = None):
+        df = pd.read_csv(csv_path, low_memory=False)
+        df_subjective = pd.read_csv(subjective_csv)
+        df_subjective = df_subjective[['maskedid']].drop_duplicates().reset_index(drop = True)
+        df_subjective['with_subjective'] = 1
+
+        df = df.join(df_subjective.set_index('maskedid'), on = 'maskedid')
+        df = df.loc[df.with_subjective.isnull() == True].reset_index(drop = True)
+        self.img_folder = img_folder
+        self.transform = transform
+        self.classindex = {'suspect': 2,
+                            'glaucoma':1, 
+                            'normal' : 0}
+        self.prob = {'Not Significant': 0,
+                        '< 10%': 1,
+                        '< 5%': 2,
+                        '< 2%' : 3,
+                        '< 1%' : 4,
+                        '< 0.5%' : 5
+                            }
+        self.rnflp = {'WNL': 0,
+                    'BL': 1,
+                    'ONL': 2
+                    }
+        if not suspect:
+            self.df = df.loc[df['classification2'] != 'suspect']
+            self.classindex.pop('suspect')
+        else:
+            self.df = df
+
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, index):
+        filename = self.df.iloc[index]["file_jpg"]
+        #glauc/msdprob/psdprob/mdinf/mdsup/rnflclass/rnflti/tnflni/rnflts/rnflns
+        label = [self.classindex[self.df.iloc[index]['classification2']],
+        self.prob[self.df.iloc[index]['mdprob']],
+        self.prob[self.df.iloc[index]['psdprob']],
+        self.prob[self.df.iloc[index]['md_inf_prob']],
+        self.prob[self.df.iloc[index]['md_sup_prob']],
+        self.rnflp[self.df.iloc[index]['rnflclass_g']],
+        self.rnflp[self.df.iloc[index]['rnflclass_ti']],
+        self.rnflp[self.df.iloc[index]['rnflclass_ni']],
+        self.rnflp[self.df.iloc[index]['rnflclass_ts']],
+        self.rnflp[self.df.iloc[index]['rnflclass_ns']]]
+        image = PIL.Image.open(os.path.join(self.img_folder,filename))
+        if self.transform is not None:
+            image = self.transform(image)
+        return image, label
+
 
 class ProgressionDataLoader(torch.utils.data.Dataset):
     def __init__(self, csv_path, img_folder,suspect =True, transform = None):
